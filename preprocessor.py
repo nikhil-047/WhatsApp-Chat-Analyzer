@@ -4,13 +4,27 @@ import pandas as pd
     
 def preprocess(data):
         pattern = '\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s'
+        pattern2 = '\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s[a-zA-Z]{1,2}\s-\s'
     
-        messages = re.split(pattern, data)[1:]
-        dates = re.findall(pattern, data)
-    
+        #messages = re.split(pattern, data)[1:]
+        #dates = re.findall(pattern, data)
+        messages=re.split(pattern,data)[1:]
+        if len(messages)==0:
+            messages=re.split(pattern2,data)[1:]
+            dates=re.findall(pattern2,data)
+        else:
+            dates=re.findall(pattern,data)
+            
         df = pd.DataFrame({'user_message': messages, 'message_date': dates})
         # convert message_date type
-        df['message_date'] = pd.to_datetime(df['message_date'], format='%m/%d/%y, %H:%M - ')
+        
+        try:
+            df['message_date'] = pd.to_datetime(dates,format='%m/%d/%y, %H:%M - ')
+        except:
+            df['message_date'] = pd.to_datetime(dates,format='%d/%m/%y, %I:%M %p - ')
+        
+        
+        #df['message_date'] = pd.to_datetime(df['message_date'], format='%m/%d/%y, %H:%M - ')
     
         df.rename(columns={'message_date': 'date'}, inplace=True)
     

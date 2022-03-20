@@ -13,7 +13,6 @@ def myFunc(e):
   k=True
   if e[0]=="+" :
    		k=False
-  	#return k
   return k
 
 
@@ -26,11 +25,12 @@ if uploaded_file is not None:
     #st.text(data)
     df = preprocessor.preprocess(data)
     
-    st.dataframe(df)
+    #st.dataframe(df)
     
     #Get all the unique users
     user_list = df['user'].unique().tolist()
-    user_list.remove('group_notification')
+    if('group_notification' in df.columns):
+        user_list.remove('group_notification')
     user_list.sort(reverse=True,key=myFunc)
     #sorted(user_list, key=lambda x: (x.isnumeric(),int(x) if x.isnumeric() else x))
     user_list.insert(0,"Overall")
