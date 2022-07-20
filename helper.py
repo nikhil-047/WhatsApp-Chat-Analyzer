@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 from urlextract import URLExtract  # To extract the url . retuens a list consisting the urls from string
 from wordcloud import WordCloud
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
