@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
 import re
 import pandas as pd
-    
+
+#This function will take the data and convert to dataframe    
 def preprocess(data):
+        # We need to seprate the above content into three parts
+        # 1 -> Date and time
+        # 2 -> Sender NAme
+        # 3 -> the message
+        # For doing this we use regular expression
+
+        # pattern for 24 hrs format "1/31/21, 18:54 - " 
         pattern = '\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s'
+        # pattern for 12 hrs format "18/07/19, 8:13 pm - " 
         pattern2 = '\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s[a-zA-Z]{1,2}\s-\s'
     
         #messages = re.split(pattern, data)[1:]
         #dates = re.findall(pattern, data)
+
+        # Separate the date and message from string data
         messages=re.split(pattern,data)[1:]
         if len(messages)==0:
             messages=re.split(pattern2,data)[1:]
@@ -15,9 +26,10 @@ def preprocess(data):
         else:
             dates=re.findall(pattern,data)
             
+        #  Create a dataframe and store messages and dates in columns   
         df = pd.DataFrame({'user_message': messages, 'message_date': dates})
-        # convert message_date type
         
+        # Convert string date to datetime.datetime convert will come handy further
         try:
             df['message_date'] = pd.to_datetime(dates,format='%m/%d/%y, %H:%M - ')
         except:
@@ -27,7 +39,9 @@ def preprocess(data):
         #df['message_date'] = pd.to_datetime(df['message_date'], format='%m/%d/%y, %H:%M - ')
     
         df.rename(columns={'message_date': 'date'}, inplace=True)
-    
+
+        # Will separte the messages and users from string and will create a new column called group notification to store notifications
+
         users = []
         messages = []
         for message in df['user_message']:
@@ -43,6 +57,7 @@ def preprocess(data):
         df['message'] = messages
         df.drop(columns=['user_message'], inplace=True)
         
+        # Since we have converted the data column to datetime we can use the following functions
         df['only_date'] = df['date'].dt.date
         df['year'] = df['date'].dt.year
         df['month_num'] = df['date'].dt.month
@@ -55,7 +70,7 @@ def preprocess(data):
         periods=[]
         for hour in df['hour']:
             if hour== 23:
-                periods.append(str(hour)+"-"+str('0,0'))
+                periods.append(str(hour)+"-"+str('00'))
             elif hour == 0:
                 periods.append(str('00')+"-"+str(hour+1))
             else:
